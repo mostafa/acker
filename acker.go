@@ -23,7 +23,12 @@ func main() {
 				Aliases: []string{"c"},
 				Usage:   "Consume messages from the queue forever",
 				Action: func(c *cli.Context) error {
-					ConsumeForever(c.String("server"), c.String("channel"))
+					ConsumeForever(
+						c.String("server"),
+						c.String("channel"),
+						c.Bool("autoack"),
+						c.Bool("recover"),
+						c.Bool("current-consumer"))
 					return nil
 				},
 				Flags: []cli.Flag{
@@ -39,6 +44,27 @@ func main() {
 						Usage:    "Queue channel name to consume from",
 						Aliases:  []string{"c"},
 						Required: true,
+					},
+					&cli.BoolFlag{
+						Name:     "autoack",
+						Value:    true,
+						Usage:    "Automatically acknowledges messages upon consumption",
+						Aliases:  []string{"a"},
+						Required: false,
+					},
+					&cli.BoolFlag{
+						Name:     "recover",
+						Value:    false,
+						Usage:    "Recover nack messages on the channel before consumption",
+						Aliases:  []string{"r"},
+						Required: false,
+					},
+					&cli.BoolFlag{
+						Name:     "current-consumer",
+						Value:    false,
+						Usage:    "Recover nack messages on the channel before consumption in this CLI consumer",
+						Aliases:  []string{"u"},
+						Required: false,
 					},
 				},
 			}, {

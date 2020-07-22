@@ -2,6 +2,9 @@ package main
 
 import (
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/streadway/amqp"
 )
@@ -12,7 +15,8 @@ func FailOnError(err error, msg string) {
 	}
 }
 
-func ConsumeForever(server string, channel string) {
+func ConsumeForever(
+	server string, channel string, autoack bool, recover bool, currentConsumer bool) {
 	if server == "" {
 		server = "amqp://guest:guest@localhost:5672/"
 	}
@@ -28,6 +32,10 @@ func ConsumeForever(server string, channel string) {
 		FailOnError(nil, "Channel name is empty")
 	}
 
+	if recover {
+		ch.Recover(currentConsumer)
+	}
+
 	queue, err := ch.QueueDeclare(
 		channel, // name
 		false,   // durable
@@ -41,7 +49,7 @@ func ConsumeForever(server string, channel string) {
 	msgs, err := ch.Consume(
 		queue.Name, // queue
 		"",         // consumer
-		true,       // auto-ack
+		autoack,    // auto-ack
 		false,      // exclusive
 		false,      // no-local
 		false,      // no-wait
@@ -50,10 +58,22 @@ func ConsumeForever(server string, channel string) {
 	FailOnError(err, "Failed to register a consumer")
 
 	forever := make(chan bool)
+	total := 0
 
 	go func() {
-		for d := range msgs {
-			log.Printf("Received a message: %s", d.Body)
+		for msg := range msgs {
+			total += 1
+			log.Printf("Received message: #%d, Content: %s", total, msg.Body)
+		}
+	}()
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM, syscall.SIGKILL, syscall.SIGABRT)
+	go func() {
+		for sig := range c {
+			log.Printf(sig.String())
+			log.Printf("Total consumed messages: %d", total)
+			os.Exit(-1)
 		}
 	}()
 

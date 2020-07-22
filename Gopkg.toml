@@ -1,0 +1,11 @@
+[[constraint]]
+  name = "github.com/urfave/cli"
+  version = "2.2.0"
+
+[[constraint]]
+  name = "github.com/streadway/amqp"
+  version = "1.0.0"
+
+[prune]
+  go-tests = true
+  unused-packages = true

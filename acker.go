@@ -46,7 +46,7 @@ func main() {
 				Aliases: []string{"p"},
 				Usage:   "Produce a message to the queue",
 				Action: func(c *cli.Context) error {
-					Produce(c.String("server"), c.String("channel"), c.String("body"))
+					Produce(c.String("server"), c.String("channel"), c.String("body"), c.Int("count"))
 					return nil
 				},
 				Flags: []cli.Flag{
@@ -69,6 +69,12 @@ func main() {
 						Usage:    "Body of message (as string)",
 						Aliases:  []string{"b"},
 						Required: true,
+					},
+					&cli.IntFlag{
+						Name:    "count",
+						Value:   1,
+						Usage:   "Number of messages to produce",
+						Aliases: []string{"n"},
 					},
 				},
 			}, {

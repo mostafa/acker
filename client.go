@@ -61,7 +61,7 @@ func ConsumeForever(server string, channel string) {
 	<-forever
 }
 
-func Produce(server string, channel string, body string) {
+func Produce(server string, channel string, body string, count int) {
 	if server == "" {
 		server = "amqp://guest:guest@localhost:5672/"
 	}
@@ -87,16 +87,27 @@ func Produce(server string, channel string, body string) {
 	)
 	FailOnError(err, "Failed to declare a queue")
 
-	err = ch.Publish(
-		"",     // exchange
-		q.Name, // routing key
-		false,  // mandatory
-		false,  // immediate
-		amqp.Publishing{
-			ContentType: "text/plain",
-			Body:        []byte(body),
-		})
-	log.Printf(" [x] Sent %s", body)
-	FailOnError(err, "Failed to publish a message")
+	if count == 0 {
+		count = 1
+	}
 
+	total := 0
+	for i := 0; i < count; i++ {
+		err = ch.Publish(
+			"",     // exchange
+			q.Name, // routing key
+			false,  // mandatory
+			false,  // immediate
+			amqp.Publishing{
+				ContentType: "text/plain",
+				Body:        []byte(body),
+			})
+		log.Printf(" [x] Sent %s", body)
+		if err == nil {
+			total += 1
+		}
+		FailOnError(err, "Failed to publish a message")
+	}
+
+	log.Printf(" [x] Published %d messages", total)
 }

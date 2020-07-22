@@ -42,6 +42,36 @@ func main() {
 					},
 				},
 			}, {
+				Name:    "produce",
+				Aliases: []string{"p"},
+				Usage:   "Produce a message to the queue",
+				Action: func(c *cli.Context) error {
+					Produce(c.String("server"), c.String("channel"), c.String("body"))
+					return nil
+				},
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:    "server",
+						Value:   "amqp://guest:guest@localhost:5672/",
+						Usage:   "RabbitMQ server address",
+						Aliases: []string{"s"},
+					},
+					&cli.StringFlag{
+						Name:     "channel",
+						Value:    "",
+						Usage:    "Queue channel name to consume from",
+						Aliases:  []string{"c"},
+						Required: true,
+					},
+					&cli.StringFlag{
+						Name:     "body",
+						Value:    "",
+						Usage:    "Body of message (as string)",
+						Aliases:  []string{"b"},
+						Required: true,
+					},
+				},
+			}, {
 				Name:    "version",
 				Aliases: []string{"v"},
 				Usage:   "Shows version info",

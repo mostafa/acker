@@ -4,10 +4,22 @@ Acker is a cli application to consume/produce messages from/to AMQP servers, e.g
 
 ## Compile from Source
 
+You can compile Acker from source with the following commands:
+
 ```bash
 $ go get github.com/mostafa/acker
 $ go $GOPATH/github.com/mostafa/acker
+$ go get
 $ go build
+$ go install
+```
+
+Alternatively you can cross-compile it using these commands:
+
+```bash
+$ go get github.com/mostafa/acker
+$ cd $GOPATH/github.com/mostafa/acker
+$ ./build.sh
 ```
 
 ## Running Acker Consumer
@@ -15,7 +27,7 @@ $ go build
 For recovering a queue from unacked messages piling up and slowing the processing, which is usually due to a non-responding consumer, run the following command. It also acts as a consumer that runs forever, until killed by `CTRL+C`.
 
 ```bash
-$ ./acker consume --server=<AMQP-URL> --channel=<CHANNEL> --autoack=true --recover=true --current-consumer=true
+$ acker consume --server=<AMQP-URL> --channel=<CHANNEL> --autoack=true --recover=true --current-consumer=true
 ```
 
 The `--server` and `--channel` flags set server and channel configuration to connect to. The `--autoack` flag causes each message consumed by Acker consumer to be automatically acknowledged. Setting `--autoack` to `false` causes unacked consumed messages to pile up the queue, which is only used for testing purposes. The `--recover` flag will recover unacknowledged messages on the channel and mark them as ready, so that they can be processed again. If the `--current-consumer` is set to `true`, the messages will be processed by the Acker consumer, otherwise it will be eventually processed by the original consumer.

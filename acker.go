@@ -12,7 +12,7 @@ import (
 func main() {
 	app := &cli.App{
 		Name:        "Acker",
-		Version:     "v0.0.1",
+		Version:     "v0.0.2",
 		HideVersion: true,
 		Compiled:    time.Now(),
 		HelpName:    "acker",
@@ -39,10 +39,10 @@ func main() {
 						Aliases: []string{"s"},
 					},
 					&cli.StringFlag{
-						Name:     "channel",
+						Name:     "queue",
 						Value:    "",
-						Usage:    "Queue channel name to consume from",
-						Aliases:  []string{"c"},
+						Usage:    "Queue name to consume from",
+						Aliases:  []string{"q"},
 						Required: true,
 					},
 					&cli.BoolFlag{
@@ -83,10 +83,10 @@ func main() {
 						Aliases: []string{"s"},
 					},
 					&cli.StringFlag{
-						Name:     "channel",
+						Name:     "queue",
 						Value:    "",
-						Usage:    "Queue channel name to consume from",
-						Aliases:  []string{"c"},
+						Usage:    "Queue name to produce to",
+						Aliases:  []string{"q"},
 						Required: true,
 					},
 					&cli.StringFlag{

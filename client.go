@@ -16,7 +16,7 @@ func FailOnError(err error, msg string) {
 }
 
 func ConsumeForever(
-	server string, channel string, autoack bool, recover bool, currentConsumer bool) {
+	server string, queue string, autoack bool, recover bool, currentConsumer bool) {
 	if server == "" {
 		server = "amqp://guest:guest@localhost:5672/"
 	}
@@ -28,32 +28,32 @@ func ConsumeForever(
 	FailOnError(err, "Failed to open a channel")
 	defer ch.Close()
 
-	if channel == "" {
-		FailOnError(nil, "Channel name is empty")
+	if queue == "" {
+		FailOnError(nil, "Queue name is empty")
 	}
 
 	if recover {
 		ch.Recover(currentConsumer)
 	}
 
-	queue, err := ch.QueueDeclare(
-		channel, // name
-		false,   // durable
-		false,   // delete when unused
-		false,   // exclusive
-		false,   // no-wait
-		nil,     // arguments
+	q, err := ch.QueueDeclare(
+		queue, // name
+		false, // durable
+		false, // delete when unused
+		false, // exclusive
+		false, // no-wait
+		nil,   // arguments
 	)
 	FailOnError(err, "Failed to declare a queue")
 
 	msgs, err := ch.Consume(
-		queue.Name, // queue
-		"",         // consumer
-		autoack,    // auto-ack
-		false,      // exclusive
-		false,      // no-local
-		false,      // no-wait
-		nil,        // args
+		q.Name,  // queue
+		"",      // consumer
+		autoack, // auto-ack
+		false,   // exclusive
+		false,   // no-local
+		false,   // no-wait
+		nil,     // args
 	)
 	FailOnError(err, "Failed to register a consumer")
 
@@ -81,7 +81,7 @@ func ConsumeForever(
 	<-forever
 }
 
-func Produce(server string, channel string, body string, count int) {
+func Produce(server string, queue string, body string, count int) {
 	if server == "" {
 		server = "amqp://guest:guest@localhost:5672/"
 	}
@@ -89,8 +89,8 @@ func Produce(server string, channel string, body string, count int) {
 	FailOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
 
-	if channel == "" {
-		FailOnError(nil, "Channel name is empty")
+	if queue == "" {
+		FailOnError(nil, "Queue name is empty")
 	}
 
 	ch, err := conn.Channel()
@@ -98,12 +98,12 @@ func Produce(server string, channel string, body string, count int) {
 	defer ch.Close()
 
 	q, err := ch.QueueDeclare(
-		channel, // name
-		false,   // durable
-		false,   // delete when unused
-		false,   // exclusive
-		false,   // no-wait
-		nil,     // arguments
+		queue, // name
+		false, // durable
+		false, // delete when unused
+		false, // exclusive
+		false, // no-wait
+		nil,   // arguments
 	)
 	FailOnError(err, "Failed to declare a queue")
 

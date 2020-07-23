@@ -16,7 +16,7 @@ func FailOnError(err error, msg string) {
 }
 
 func ConsumeForever(
-	server string, queue string, autoack bool, recover bool, currentConsumer bool) {
+	server string, queue string, existing_queue bool, autoack bool, recover bool, currentConsumer bool) {
 	if server == "" {
 		server = "amqp://guest:guest@localhost:5672/"
 	}
@@ -36,19 +36,33 @@ func ConsumeForever(
 		ch.Recover(currentConsumer)
 	}
 
-	q, err := ch.QueueDeclare(
-		queue, // name
-		false, // durable
-		false, // delete when unused
-		false, // exclusive
-		false, // no-wait
-		nil,   // arguments
-	)
-	FailOnError(err, "Failed to declare a queue")
+	q := amqp.Queue{}
+
+	if existing_queue {
+		q, err = ch.QueueDeclarePassive(
+			queue, // name
+			true,  // durable
+			false, // delete when unused (auto_delete)
+			false, // exclusive
+			false, // no-wait
+			nil,   // arguments
+		)
+		FailOnError(err, "Queue does not exist")
+	} else {
+		q, err = ch.QueueDeclare(
+			queue, // name
+			true,  // durable
+			false, // delete when unused (auto_delete)
+			false, // exclusive
+			false, // no-wait
+			nil,   // arguments
+		)
+		FailOnError(err, "Failed to create the queue")
+	}
 
 	msgs, err := ch.Consume(
 		q.Name,  // queue
-		"",      // consumer
+		"acker", // consumer
 		autoack, // auto-ack
 		false,   // exclusive
 		false,   // no-local
@@ -81,7 +95,7 @@ func ConsumeForever(
 	<-forever
 }
 
-func Produce(server string, queue string, body string, count int) {
+func Produce(server string, queue string, existing_queue bool, body string, count int) {
 	if server == "" {
 		server = "amqp://guest:guest@localhost:5672/"
 	}
@@ -97,15 +111,29 @@ func Produce(server string, queue string, body string, count int) {
 	FailOnError(err, "Failed to open a channel")
 	defer ch.Close()
 
-	q, err := ch.QueueDeclare(
-		queue, // name
-		false, // durable
-		false, // delete when unused
-		false, // exclusive
-		false, // no-wait
-		nil,   // arguments
-	)
-	FailOnError(err, "Failed to declare a queue")
+	q := amqp.Queue{}
+
+	if existing_queue {
+		q, err = ch.QueueDeclarePassive(
+			queue, // name
+			true,  // durable
+			false, // delete when unused (auto_delete)
+			false, // exclusive
+			false, // no-wait
+			nil,   // arguments
+		)
+		FailOnError(err, "Queue does not exist")
+	} else {
+		q, err = ch.QueueDeclare(
+			queue, // name
+			true,  // durable
+			false, // delete when unused (auto_delete)
+			false, // exclusive
+			false, // no-wait
+			nil,   // arguments
+		)
+		FailOnError(err, "Failed to declare a queue")
+	}
 
 	if count == 0 {
 		count = 1
@@ -114,7 +142,7 @@ func Produce(server string, queue string, body string, count int) {
 	total := 0
 	for i := 0; i < count; i++ {
 		err = ch.Publish(
-			"",     // exchange
+			q.Name, // exchange
 			q.Name, // routing key
 			false,  // mandatory
 			false,  // immediate

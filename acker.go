@@ -25,7 +25,8 @@ func main() {
 				Action: func(c *cli.Context) error {
 					ConsumeForever(
 						c.String("server"),
-						c.String("channel"),
+						c.String("queue"),
+						c.Bool("existing_queue"),
 						c.Bool("autoack"),
 						c.Bool("recover"),
 						c.Bool("current-consumer"))
@@ -46,6 +47,13 @@ func main() {
 						Required: true,
 					},
 					&cli.BoolFlag{
+						Name:     "existing-queue",
+						Value:    true,
+						Usage:    "Connect to an existing queue",
+						Aliases:  []string{"e"},
+						Required: false,
+					},
+					&cli.BoolFlag{
 						Name:     "autoack",
 						Value:    true,
 						Usage:    "Automatically acknowledges messages upon consumption",
@@ -55,14 +63,14 @@ func main() {
 					&cli.BoolFlag{
 						Name:     "recover",
 						Value:    false,
-						Usage:    "Recover nack messages on the channel before consumption",
+						Usage:    "Recover nack messages on the queue before consumption",
 						Aliases:  []string{"r"},
 						Required: false,
 					},
 					&cli.BoolFlag{
 						Name:     "current-consumer",
 						Value:    false,
-						Usage:    "Recover nack messages on the channel before consumption in this CLI consumer",
+						Usage:    "Recover nack messages on the queue before consumption in this CLI consumer",
 						Aliases:  []string{"u"},
 						Required: false,
 					},
@@ -72,7 +80,12 @@ func main() {
 				Aliases: []string{"p"},
 				Usage:   "Produce a message to the queue",
 				Action: func(c *cli.Context) error {
-					Produce(c.String("server"), c.String("channel"), c.String("body"), c.Int("count"))
+					Produce(
+						c.String("server"),
+						c.String("queue"),
+						c.Bool("existing_queue"),
+						c.String("body"),
+						c.Int("count"))
 					return nil
 				},
 				Flags: []cli.Flag{
@@ -88,6 +101,13 @@ func main() {
 						Usage:    "Queue name to produce to",
 						Aliases:  []string{"q"},
 						Required: true,
+					},
+					&cli.BoolFlag{
+						Name:     "existing-queue",
+						Value:    true,
+						Usage:    "Connect to an existing queue",
+						Aliases:  []string{"e"},
+						Required: false,
 					},
 					&cli.StringFlag{
 						Name:     "body",

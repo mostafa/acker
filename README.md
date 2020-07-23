@@ -37,7 +37,7 @@ The `--server` and `--channel` flags set server and channel configuration to con
 For producing messages on the queue, run the following command:
 
 ```bash
-$ ./acker produce --server=<AMQP-URL> --channel=<CHANNEL> --body="<BODY>" --count=10
+$ acker produce --server=<AMQP-URL> --channel=<CHANNEL> --body="<BODY>" --count=10
 ```
 
 Just like the Acker consumer, the `--server` and `--channel` flags set server and channel configuration to connect to. The `--body` specifies the body of the message to be published on the queue. The `--count` specifies the number of messages to be produced.

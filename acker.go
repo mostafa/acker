@@ -12,7 +12,7 @@ import (
 func main() {
 	app := &cli.App{
 		Name:        "Acker",
-		Version:     "v0.0.2",
+		Version:     "v0.0.3",
 		HideVersion: true,
 		Compiled:    time.Now(),
 		HelpName:    "acker",

@@ -30,7 +30,7 @@ For recovering a queue from unacked messages piling up and slowing the processin
 $ acker consume --server=<AMQP-URL> --queue=<QUEUE> --autoack=true --recover=true --current-consumer=true
 ```
 
-The `--server` and `--queue` flags set server and queue configuration to connect to. The `--autoack` flag causes each message consumed by Acker consumer to be automatically acknowledged. Setting `--autoack` to `false` causes unacked consumed messages to pile up the queue, which is only used for testing purposes. The `--recover` flag will recover unacknowledged messages on the queue and mark them as ready, so that they can be processed again. If the `--current-consumer` is set to `true`, the messages will be processed by the Acker consumer, otherwise it will be eventually processed by the original consumer.
+The `--server` and `--queue` flags set server and queue configuration to connect to. The `--autoack` flag causes each message consumed by Acker consumer to be automatically acknowledged. Setting `--autoack` to `false` causes unacked consumed messages to pile up the queue, which is only used for testing purposes. The `--recover` flag will recover unacknowledged messages on the queue and mark them as ready, so that they can be processed again. Setting the `--recover` flags also means that the messages will be processed by the Acker consumer.
 
 ## Running Acker Producer
 

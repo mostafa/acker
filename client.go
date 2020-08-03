@@ -16,7 +16,7 @@ func FailOnError(err error, msg string) {
 }
 
 func ConsumeForever(
-	server string, queue string, existing_queue bool, autoack bool, recover bool, currentConsumer bool) {
+	server string, queue string, existing_queue bool, autoack bool, recover bool) {
 	if server == "" {
 		server = "amqp://guest:guest@localhost:5672/"
 	}
@@ -32,9 +32,7 @@ func ConsumeForever(
 		FailOnError(nil, "Queue name is empty")
 	}
 
-	if recover {
-		ch.Recover(currentConsumer)
-	}
+	ch.Recover(recover)
 
 	q := amqp.Queue{}
 
@@ -76,7 +74,7 @@ func ConsumeForever(
 
 	go func() {
 		for msg := range msgs {
-			total += 1
+			total++
 			log.Printf("Received message: #%d, Content: %s", total, msg.Body)
 		}
 	}()

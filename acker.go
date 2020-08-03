@@ -12,7 +12,7 @@ import (
 func main() {
 	app := &cli.App{
 		Name:        "Acker",
-		Version:     "v0.0.3",
+		Version:     "v0.0.4",
 		HideVersion: true,
 		Compiled:    time.Now(),
 		HelpName:    "acker",
@@ -28,8 +28,7 @@ func main() {
 						c.String("queue"),
 						c.Bool("existing_queue"),
 						c.Bool("autoack"),
-						c.Bool("recover"),
-						c.Bool("current-consumer"))
+						c.Bool("recover"))
 					return nil
 				},
 				Flags: []cli.Flag{
@@ -63,15 +62,8 @@ func main() {
 					&cli.BoolFlag{
 						Name:     "recover",
 						Value:    false,
-						Usage:    "Recover nack messages on the queue before consumption",
+						Usage:    "Recover nack messages on the queue before consumption with the current consumer",
 						Aliases:  []string{"r"},
-						Required: false,
-					},
-					&cli.BoolFlag{
-						Name:     "current-consumer",
-						Value:    false,
-						Usage:    "Recover nack messages on the queue before consumption in this CLI consumer",
-						Aliases:  []string{"u"},
 						Required: false,
 					},
 				},
